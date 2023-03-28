@@ -6,13 +6,15 @@ public:
   static const int row = 6;
   static const int columb = 7;
   char gridView[row][columb];
-  int lastRow[columb] = {5, 5, 5, 5, 5, 5, 5};
+  int lastRow[columb];
   void InitializeGrid() {
     for (int i = 0; i < row; i++) {
       for (int j = 0; j < columb; j++) {
         gridView[i][j] = '0';
       }
     }
+    for (int i = 0; i < columb; i++)
+      lastRow[i] = row - 1;
   }
   void PrintGrid() {
     for (int i = 0; i < row; i++) {
@@ -34,7 +36,97 @@ public:
     gridView[rowNo][columbNo] = colour;
     lastRow[columbNo]--;
   }
-  bool GameOver() { return false; }
+
+private:
+  bool checkHorizontal(int rowNo, int columbNo) {
+    int count = 0;
+    for (int i = rowNo; i >= 0; i--) {
+      if (gridView[i][columbNo] == gridView[rowNo][columbNo])
+        count++;
+      else
+        break;
+      if (count == 4)
+        return true;
+    }
+    for (int i = rowNo + 1; i < row; i++) {
+      if (gridView[i][columbNo] == gridView[rowNo][columbNo])
+        count++;
+      else
+        break;
+      if (count == 4)
+        return true;
+    }
+    return false;
+  }
+  bool checkVertical(int rowNo, int columbNo) {
+    int count = 0;
+    for (int i = columbNo; i >= 0; i--) {
+      if (gridView[rowNo][i] == gridView[rowNo][columbNo])
+        count++;
+      else
+        break;
+      if (count == 4)
+        return true;
+    }
+    for (int i = columbNo + 1; i < columb; i++) {
+      if (gridView[rowNo][i] == gridView[rowNo][columbNo])
+        count++;
+      else
+        break;
+      if (count == 4)
+        return true;
+    }
+    return false;
+  }
+  bool checkDiagonal0(int rowNo, int columbNo) {
+    int count = 0;
+    for (int i = rowNo - 1, j = columbNo + 1; i >= 0 && j < columb; i--, j++) {
+      if (gridView[i][j] == gridView[rowNo][columbNo])
+        count++;
+      else
+        break;
+      if (count == 4)
+        return true;
+    }
+    for (int i = rowNo, j = columbNo; i < row && j >= 0; i++, j--) {
+      if (gridView[i][j] == gridView[rowNo][columbNo])
+        count++;
+      else
+        break;
+      if (count == 4)
+        return true;
+    }
+    count = 0;
+    for (int i = rowNo - 1, j = columbNo - 1; i >= 0 && j >= 0; i--, j--) {
+      if (gridView[i][j] == gridView[rowNo][columbNo])
+        count++;
+      else
+        break;
+      if (count == 4)
+        return true;
+    }
+    for (int i = rowNo, j = columbNo; i < row && j < columb; i++, j++) {
+      if (gridView[i][j] == gridView[rowNo][columbNo])
+        count++;
+      else
+        break;
+      if (count == 4)
+        return true;
+    }
+    return false;
+  }
+
+public:
+  bool GameOver(int columbNo) {
+    int rowNo = lastRow[columbNo] + 1;
+    if (checkHorizontal(rowNo, columbNo))
+      return true;
+    if (checkVertical(rowNo, columbNo))
+      return true;
+    if (checkDiagonal0(rowNo, columbNo))
+      return true;
+    return false;
+  }
 };
 class gameplay : grid {
   grid Grid;
@@ -62,7 +154,9 @@ class gameplay : grid {
     Grid.InsertElement(colour, insertColumb);
     Grid.PrintGrid();
     boardFull = Grid.BoardFull();
-    gameOver = Grid.GameOver();
+    gameOver = Grid.GameOver(insertColumb);
+    if (gameOver)
+      playerWon = playerNo;
   }
   void gameLoop() {
     while (!boardFull && !gameOver) {
@@ -74,6 +168,9 @@ class gameplay : grid {
     if (boardFull) {
       cout << "Its a draw\n";
       return;
+    }
+    if (gameOver) {
+      cout << "Player " << playerWon << " won!";
     }
   }
 
