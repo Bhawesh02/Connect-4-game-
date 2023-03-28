@@ -78,7 +78,7 @@ private:
     }
     return false;
   }
-  bool checkDiagonal0(int rowNo, int columbNo) {
+  bool checkDiagonal(int rowNo, int columbNo) {
     int count = 0;
     for (int i = rowNo - 1, j = columbNo + 1; i >= 0 && j < columb; i--, j++) {
       if (gridView[i][j] == gridView[rowNo][columbNo])
@@ -123,7 +123,7 @@ public:
       return true;
     if (checkVertical(rowNo, columbNo))
       return true;
-    if (checkDiagonal0(rowNo, columbNo))
+    if (checkDiagonal(rowNo, columbNo))
       return true;
     return false;
   }
